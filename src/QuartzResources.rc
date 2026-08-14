@@ -1,0 +1,3 @@
+#include "QuartzResources.h"
+
+IDR_FONT_MONO RCDATA "..\\assets\\fonts\\JetBrainsMono-Regular.ttf"

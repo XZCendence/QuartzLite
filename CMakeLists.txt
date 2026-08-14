@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(Quartz CXX)
+project(Quartz CXX RC)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -11,6 +11,7 @@ add_executable(Quartz WIN32
 	src/QuartzFastTail.cpp
 	src/QuartzLogView.cpp
 	src/QuartzNotify.cpp
+	src/QuartzResources.rc
 	third_party/imgui/imgui.cpp
 	third_party/imgui/imgui_draw.cpp
 	third_party/imgui/imgui_tables.cpp
@@ -27,8 +28,3 @@ target_link_libraries(Quartz PRIVATE d3d11 d3dcompiler dxgi dwmapi shell32 comdl
 if(MSVC)
 	target_compile_options(Quartz PRIVATE /W4 /utf-8)
 endif()
-
-# The fonts ship next to the executable.
-add_custom_command(TARGET Quartz POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy_directory
-		${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:Quartz>/assets)

@@ -5,6 +5,7 @@
 #include "QuartzFastTail.h"
 #include "QuartzLogView.h"
 #include "QuartzNotify.h"
+#include "QuartzResources.h"
 
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -537,7 +538,8 @@ int WINAPI wWinMain(HINSTANCE Instance, HINSTANCE, PWSTR, int)
 	RegisterLogViewSettings();
 	QuartzUI::RegisterChromeSettingsHandler();
 
-	// segoe ui for chrome. jetbrains mono next to the exe first, then the source tree
+	// segoe ui for chrome. jetbrains mono is baked into the exe as a resource so a bare
+	// download of Quartz.exe is self-contained
 	{
 		ImFont* UiFont = nullptr;
 		wchar_t WinBuf[MAX_PATH];
@@ -554,24 +556,19 @@ int WINAPI wWinMain(HINSTANCE Instance, HINSTANCE, PWSTR, int)
 			IO.Fonts->AddFontDefault();
 		}
 
-		wchar_t ExeBuf[MAX_PATH];
-		::GetModuleFileNameW(nullptr, ExeBuf, MAX_PATH);
-		std::string ExeDir = WideToUtf8(ExeBuf);
-		const size_t Slash = ExeDir.find_last_of("/\\");
-		ExeDir = Slash == std::string::npos ? "." : ExeDir.substr(0, Slash);
-		const std::string MonoCandidates[] = {
-			ExeDir + "\\assets\\fonts\\JetBrainsMono-Regular.ttf",
-			ExeDir + "\\..\\assets\\fonts\\JetBrainsMono-Regular.ttf",
-			ExeDir + "\\..\\..\\assets\\fonts\\JetBrainsMono-Regular.ttf",
-		};
-		for (const std::string& Candidate : MonoCandidates)
+		if (HRSRC Resource = ::FindResourceW(nullptr, MAKEINTRESOURCEW(IDR_FONT_MONO), (LPWSTR)RT_RCDATA))
 		{
-			if (FileExists(Candidate))
+			if (HGLOBAL Handle = ::LoadResource(nullptr, Resource))
 			{
-				GMonoFont = IO.Fonts->AddFontFromFileTTF(Candidate.c_str(), 15.0f);
-				if (GMonoFont)
+				void* Data = ::LockResource(Handle);
+				const DWORD Size = ::SizeofResource(nullptr, Resource);
+				if (Data && Size > 0)
 				{
-					break;
+					// resource memory lives as long as the process. the atlas must not
+					// take ownership or it would free a pointer it cannot free
+					ImFontConfig Config;
+					Config.FontDataOwnedByAtlas = false;
+					GMonoFont = IO.Fonts->AddFontFromMemoryTTF(Data, (int32)Size, 15.0f, &Config);
 				}
 			}
 		}
