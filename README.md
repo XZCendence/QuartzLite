@@ -2,6 +2,8 @@
 
 quartz is a native log viewer for UEFN but you can really use it for anything. It was born out of my frustration with UE's shitty log viewer that takes several seconds to open and is incredibly slow to scroll. Don't even get me started on the search functionality.
 
+![Quartz](docs/screenshot.png)
+
 Built on ImGui v1.92.9 docking branch, along with the dx11 backend impl.
 
 ## Building
