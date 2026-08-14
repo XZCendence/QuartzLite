@@ -1,0 +1,12 @@
+CompileFlags:
+  CompilationDatabase: build
+  Add:
+    - --target=x86_64-pc-windows-msvc
+    - -std=c++17
+    - -Isrc
+    - -Ithird_party/imgui
+    - -DUNICODE
+    - -D_UNICODE
+    - -DNOMINMAX
+    - -DWIN32_LEAN_AND_MEAN
+    - -D_CRT_SECURE_NO_WARNINGS
